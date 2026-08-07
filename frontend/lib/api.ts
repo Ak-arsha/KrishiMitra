@@ -19,6 +19,7 @@ api.interceptors.request.use((config) => {
 
 export const registerUser = (payload: any) => api.post("/api/auth/register", payload);
 export const loginUser = (payload: any) => api.post("/api/auth/login", payload);
+export const googleLoginUser = (payload: any) => api.post("/api/auth/google", payload);
 
 // Farmer Dashboard
 export const getFarmerDashboard = () => api.get("/api/farmer/dashboard");

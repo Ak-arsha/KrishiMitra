@@ -17,6 +17,13 @@ class UserLogin(BaseModel):
     password: str
 
 
+class GoogleLoginRequest(BaseModel):
+    email: EmailStr
+    full_name: str
+    google_id: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+
 class UserOut(BaseModel):
     id: int
     full_name: str

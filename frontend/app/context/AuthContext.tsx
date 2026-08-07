@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser, registerUser } from "@/lib/api";
+import { loginUser, registerUser, googleLoginUser } from "@/lib/api";
 
 interface User {
   id: string;
@@ -18,6 +18,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (email?: string, name?: string) => Promise<void>;
   register: (email: string, password: string, full_name: string, role: string, location: string, lat: number, lng: number) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -54,9 +55,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("farmer", JSON.stringify(data.user));
       router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      throw error;
+      const detail = error.response?.data?.detail;
+      const message = typeof detail === "string" ? detail : (Array.isArray(detail) ? detail[0]?.msg : "Login failed. Please check backend connection.");
+      throw new Error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async (customEmail?: string, customName?: string) => {
+    setIsLoading(true);
+    try {
+      const email = customEmail || "google.user@example.com";
+      const full_name = customName || "Google Account User";
+      const response = await googleLoginUser({ email, full_name });
+      const data = response.data;
+      setToken(data.access_token);
+      setUser(data.user);
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("farmer", JSON.stringify(data.user));
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      const detail = error.response?.data?.detail;
+      const message = typeof detail === "string" ? detail : "Google Sign In failed. Please try again.";
+      throw new Error(message);
     } finally {
       setIsLoading(false);
     }
@@ -89,9 +115,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("farmer", JSON.stringify(data.user));
       router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      throw error;
+      const detail = error.response?.data?.detail;
+      const message = typeof detail === "string" ? detail : (Array.isArray(detail) ? detail[0]?.msg : "Registration failed. Please try again.");
+      throw new Error(message);
     } finally {
       setIsLoading(false);
     }
@@ -102,11 +130,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("farmer");
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, loginWithGoogle, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
