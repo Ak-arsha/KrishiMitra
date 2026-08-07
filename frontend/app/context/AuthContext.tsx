@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginUser, registerUser } from "@/lib/api";
 
 interface User {
   id: string;
@@ -45,21 +46,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-
-      const data = await response.json();
+      const response = await loginUser({ email, password });
+      const data = response.data;
       setToken(data.access_token);
       setUser(data.user);
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("farmer", JSON.stringify(data.user));
       router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
@@ -80,29 +73,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          full_name,
-          role,
-          location_name: location,
-          latitude: lat,
-          longitude: lng,
-        }),
+      const response = await registerUser({
+        email,
+        password,
+        full_name,
+        role,
+        location_name: location,
+        latitude: lat,
+        longitude: lng,
       });
-
-      if (!response.ok) {
-        throw new Error("Registration failed");
-      }
-
-      const data = await response.json();
+      const data = response.data;
       setToken(data.access_token);
       setUser(data.user);
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("farmer", JSON.stringify(data.user));
       router.push("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);

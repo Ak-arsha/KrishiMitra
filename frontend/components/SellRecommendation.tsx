@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle, Clock, TrendingUp } from "lucide-react";
+import { getSellRecommendation } from "@/lib/api";
 
 interface SellRecommendationProps {
   crop: string;
@@ -23,30 +24,29 @@ export default function SellRecommendation({ crop }: SellRecommendationProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching recommendation from ML model
-    setLoading(true);
-    
-    // Mock recommendation based on crop
-    const mockRec: Recommendation = {
-      type: Math.random() > 0.5 ? "sell_now" : "wait",
-      confidence: Math.floor(Math.random() * 20) + 75,
-      reason:
-        Math.random() > 0.5
-          ? `Current market prices for ${crop} are at a 3-month high. Market demand is strong.`
-          : `Price forecasts show ${crop} prices may increase by 5-8% in the next 2-3 days.`,
-      factors: [
-        "Market demand is high",
-        "Weather conditions favorable",
-        `₹ price point is optimal for ${crop}`,
-        "Low supply in your region"
-      ],
-      estimatedBestDay: new Date(Date.now() + Math.random() * 5 * 24 * 60 * 60 * 1000)
-        .toLocaleDateString("en-IN", { weekday: "long", month: "short", day: "numeric" }),
-      potentialGain: Math.floor(Math.random() * 500) + 100
+    const fetchRecommendation = async () => {
+      setLoading(true);
+      try {
+        const response = await getSellRecommendation(crop);
+        const payload = response.data;
+        setRecommendation({
+          type: payload.recommendation as RecommendationType,
+          confidence: payload.confidence,
+          reason: payload.reason,
+          factors: payload.factors || [],
+          estimatedBestDay: payload.estimated_best_day || payload.estimated_best_day || payload.estimatedBestDay || "Soon",
+          potentialGain: payload.potential_gain || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch recommendation:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setRecommendation(mockRec);
-    setLoading(false);
+    if (crop) {
+      fetchRecommendation();
+    }
   }, [crop]);
 
   if (loading) {

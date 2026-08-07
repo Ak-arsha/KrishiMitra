@@ -8,6 +8,7 @@ import CropInput from "@/components/CropInput";
 import MarketPrices from "@/components/MarketPrices";
 import PriceForecast from "@/components/PriceForecast";
 import SellRecommendation from "@/components/SellRecommendation";
+import { getFarmerDashboard } from "@/lib/api";
 
 interface Farmer {
   id: string;
@@ -25,19 +26,29 @@ export default function FarmerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
       return;
     }
 
-    // Load farmer profile
-    const farmerData = localStorage.getItem("farmer");
-    if (farmerData) {
-      setFarmer(JSON.parse(farmerData));
-    }
-    setLoading(false);
+    const loadDashboard = async () => {
+      try {
+        const response = await getFarmerDashboard();
+        setFarmer(response.data.farmer || null);
+        localStorage.setItem("farmer", JSON.stringify(response.data.farmer));
+      } catch (error) {
+        console.error("Failed to load dashboard", error);
+        const farmerData = localStorage.getItem("farmer");
+        if (farmerData) {
+          setFarmer(JSON.parse(farmerData));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
   }, [router]);
 
   const handleCropSelected = (crop: string) => {

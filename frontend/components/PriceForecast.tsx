@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { ArrowUp, ArrowDown, TrendingUp } from "lucide-react";
+import { getPriceForecast } from "@/lib/api";
 
 interface ForecastDay {
   day: string;
   date: string;
-  predictedPrice: number;
+  predicted_price: number;
   confidence: number;
   trend: "up" | "down" | "stable";
 }
@@ -21,33 +22,21 @@ export default function PriceForecast({ crop, location }: PriceForecastProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching forecast data
-    setLoading(true);
-    
-    // Mock forecast data based on crop
-    const mockForecast: ForecastDay[] = [];
-    const today = new Date();
-    const basePrice = Math.floor(Math.random() * 5000) + 1000;
+    const fetchForecast = async () => {
+      setLoading(true);
+      try {
+        const response = await getPriceForecast(crop);
+        setForecast(response.data.forecast || []);
+      } catch (error) {
+        console.error("Failed to fetch forecast:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    for (let i = 1; i <= 5; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      
-      // Simulate price variations
-      const priceVariation = (Math.random() - 0.5) * 500;
-      const trend = priceVariation > 100 ? "up" : priceVariation < -100 ? "down" : "stable";
-      
-      mockForecast.push({
-        day: date.toLocaleDateString("en-IN", { weekday: "short" }),
-        date: date.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
-        predictedPrice: Math.max(basePrice + priceVariation, basePrice * 0.8),
-        confidence: Math.floor(Math.random() * 20) + 75, // 75-95% confidence
-        trend
-      });
+    if (crop) {
+      fetchForecast();
     }
-
-    setForecast(mockForecast);
-    setLoading(false);
   }, [crop, location]);
 
   const getTrendColor = (trend: string) => {
@@ -89,10 +78,10 @@ export default function PriceForecast({ crop, location }: PriceForecastProps) {
 
   // Calculate average and trend
   const avgPrice = Math.floor(
-    forecast.reduce((sum, day) => sum + day.predictedPrice, 0) / forecast.length
+    forecast.reduce((sum, day) => sum + day.predicted_price, 0) / forecast.length
   );
-  const firstPrice = forecast[0]?.predictedPrice || 0;
-  const lastPrice = forecast[4]?.predictedPrice || 0;
+  const firstPrice = forecast[0]?.predicted_price || 0;
+  const lastPrice = forecast[forecast.length - 1]?.predicted_price || 0;
   const overallTrend = lastPrice > firstPrice ? "📈 Going Up" : lastPrice < firstPrice ? "📉 Going Down" : "➡️ Stable";
 
   return (
@@ -134,7 +123,7 @@ export default function PriceForecast({ crop, location }: PriceForecastProps) {
 
               {/* Price */}
               <p className="text-lg font-bold text-gray-800 mb-1">
-                ₹{Math.floor(day.predictedPrice)}
+                ₹{Math.floor(day.predicted_price)}
               </p>
 
               {/* Confidence */}

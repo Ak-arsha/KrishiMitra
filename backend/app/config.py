@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Supabase / DB
-    SUPABASE_URL: str = ""
+    SUPABASE_URL: str = "https://bzaevtaubnhqadetigco.supabase.co"
     SUPABASE_KEY: str = ""
     DATABASE_URL: str = "sqlite:///./krishimitra.db"  # falls back to local sqlite for dev/demo
 
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # App
     ENVIRONMENT: str = "development"
-    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
 
 settings = Settings()
