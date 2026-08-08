@@ -27,9 +27,9 @@ def generate_text(prompt: str, fallback: str) -> str:
         return fallback
     try:
         import google.generativeai as genai
-        for model_name in ["gemini-1.5-flash", "gemini-[1.5]-pro", "gemini-pro"]:
+        for model_name in ["gemini-flash-latest", "gemini-2.0-flash", "gemini-2.5-flash", "gemini-pro-latest"]:
             try:
-                model = genai.GenerativeModel(model_name.replace("[1.5]-", "1.5-"))
+                model = genai.GenerativeModel(model_name)
                 response = model.generate_content(prompt)
                 if response.text:
                     return response.text.strip()
