@@ -27,9 +27,15 @@ def generate_text(prompt: str, fallback: str) -> str:
         return fallback
     try:
         import google.generativeai as genai
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        for model_name in ["gemini-1.5-flash", "gemini-[1.5]-pro", "gemini-pro"]:
+            try:
+                model = genai.GenerativeModel(model_name.replace("[1.5]-", "1.5-"))
+                response = model.generate_content(prompt)
+                if response.text:
+                    return response.text.strip()
+            except Exception:
+                continue
+        return fallback
     except Exception:
         return fallback
 
