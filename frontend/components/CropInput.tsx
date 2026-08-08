@@ -18,7 +18,7 @@ export default function CropInput({ onCropSelected }: CropInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   // Initialize Web Speech API
   React.useEffect(() => {
@@ -118,7 +118,7 @@ export default function CropInput({ onCropSelected }: CropInputProps) {
         <div className="flex gap-2">
           <Button
             onClick={isListening ? stopListening : startListening}
-            variant={isListening ? "destructive" : "outline"}
+            variant={isListening ? "accent" : "outline"}
             className="flex-1 gap-2"
           >
             <Mic size={18} />
