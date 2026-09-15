@@ -1,3 +1,9 @@
+# Next.js & Node
+node_modules/
+.next/
+.env.local
+.env
+
 # Backend
 backend/venv/
 backend/__pycache__/
@@ -7,7 +13,7 @@ backend/data/
 backend/app/ai/models/*.joblib
 backend/.env
 
-# Frontend
+# Frontend subfolder
 frontend/node_modules/
 frontend/.next/
 frontend/.env.local
