@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
-import { Leaf, AlertCircle, Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight, ShieldCheck, UserCheck, ExternalLink } from "lucide-react";
+import { Leaf, AlertCircle, Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight, ShieldCheck, UserCheck, ExternalLink, Building2, PieChart, TrendingUp } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -74,13 +74,13 @@ export default function LoginPage() {
     await handleInstantGoogleLogin(customGoogleEmail, name);
   };
 
-  const handleAutoFillDemo = async () => {
-    setEmail("farmer@example.com");
+  const handleRoleDemoLogin = async (roleEmail: string) => {
+    setEmail(roleEmail);
     setPassword("password123");
     setError("");
     setIsLoading(true);
     try {
-      await login("farmer@example.com", "password123");
+      await login(roleEmail, "password123");
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Demo login failed.");
@@ -91,11 +91,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Agriculture Photo Background */}
+      {/* Background Photography */}
       <div className="absolute inset-0 z-0 opacity-25 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/90 to-emerald-950/80 z-0 pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md relative z-10 my-8">
         {/* Brand Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-3.5 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl text-slate-950 shadow-xl shadow-emerald-500/20 mb-3 border border-emerald-400/30">
@@ -113,7 +113,7 @@ export default function LoginPage() {
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Sign In</h2>
-            <p className="text-gray-500 text-sm mt-0.5">Access your customized platform dashboard</p>
+            <p className="text-gray-500 text-sm mt-0.5">Access your customized role dashboard</p>
           </div>
 
           {error && (
@@ -224,20 +224,47 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Button */}
-          <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
-            <div>
-              <h4 className="text-xs font-extrabold text-emerald-950 uppercase">Instant Demo Account</h4>
-              <p className="text-xs text-emerald-700 font-medium">1-Click Auto-Login for testing</p>
+          {/* 4 Role Demo Logins Box */}
+          <div className="mt-6 bg-slate-50 border border-gray-200 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">1-Click Role Demo Logins</h4>
             </div>
-            <button
-              type="button"
-              onClick={handleAutoFillDemo}
-              disabled={isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow"
-            >
-              Auto-Login
-            </button>
+            <p className="text-[11px] text-gray-500 font-medium">Click any role below to test its isolated workspace:</p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleRoleDemoLogin("farmer@example.com")}
+                className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <Leaf size={14} /> Farmer Demo
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleDemoLogin("buyer@example.com")}
+                className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <Building2 size={14} /> Buyer Demo
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleDemoLogin("investor@example.com")}
+                className="p-2 bg-teal-100 hover:bg-teal-200 text-teal-900 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <PieChart size={14} /> Investor Demo
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleDemoLogin("trader@example.com")}
+                className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <TrendingUp size={14} /> Trader Demo
+              </button>
+            </div>
           </div>
 
           <p className="text-center text-gray-500 text-sm mt-6 font-medium">
@@ -249,11 +276,10 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Authentic Google OAuth Popup Window Frame Simulation */}
+      {/* Authentic Google OAuth Popup Window Simulation */}
       {showGoogleWindow && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-gray-300 overflow-hidden font-sans border-t-8 border-t-blue-500">
-            {/* Google Window Header */}
             <div className="bg-slate-100 px-5 py-3 border-b border-gray-200 flex items-center justify-between text-xs text-gray-600">
               <div className="flex items-center gap-2 font-mono text-[11px] text-gray-500 truncate">
                 <ExternalLink size={13} className="text-blue-600" />
@@ -270,7 +296,6 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Google Brand Header */}
             <div className="p-6 text-center space-y-2 border-b border-gray-100">
               <svg className="w-8 h-8 mx-auto" viewBox="0 0 24 24">
                 <path
@@ -294,7 +319,6 @@ export default function LoginPage() {
               <p className="text-xs text-gray-500">to continue to <strong className="text-gray-800">KrishiMitra Platform</strong></p>
             </div>
 
-            {/* Google Accounts Selection List */}
             <div className="p-6 space-y-3">
               {!showCustomInput ? (
                 <>
