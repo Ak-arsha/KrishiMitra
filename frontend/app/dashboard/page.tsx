@@ -29,19 +29,34 @@ import {
   ArrowUpRight,
   BarChart3,
   Layers,
+  Send,
+  Loader2,
+  Bot,
+  User,
+  Volume2,
 } from "lucide-react";
 import CropInput from "@/components/CropInput";
 import MarketPrices from "@/components/MarketPrices";
 import PriceForecast from "@/components/PriceForecast";
 import SellRecommendation from "@/components/SellRecommendation";
 import { useAuth } from "@/app/context/AuthContext";
+import { askVoiceAssistant } from "@/lib/api";
 
-export default function UnifiedDashboard() {
+export default function RoleIsolatedDashboard() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<"farmer" | "buyer" | "investor">("farmer");
   const [selectedCrop, setSelectedCrop] = useState<string>("Wheat");
   const [loading, setLoading] = useState(true);
+
+  // Embedded Voice Chatbot State for All Roles
+  const [chatQuery, setChatQuery] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([
+    {
+      role: "assistant",
+      text: "Namaste! I am your AI KrishiMitra Assistant. How can I help you with prices, procurement, or market intelligence today?",
+    },
+  ]);
 
   // Buyer State
   const [buyerCropFilter, setBuyerCropFilter] = useState("All");
@@ -53,7 +68,7 @@ export default function UnifiedDashboard() {
     deliveryLocation: "Jaipur Mandi Hub",
   });
 
-  // Investor State
+  // Investor & Trader State
   const [investmentAmount, setInvestmentAmount] = useState(500000);
   const [investorCrop, setInvestorCrop] = useState("Mustard");
   const [holdingMonths, setHoldingMonths] = useState(3);
@@ -126,8 +141,6 @@ export default function UnifiedDashboard() {
 
     if (user) {
       setLoading(false);
-      if (user.role === "buyer") setActiveTab("buyer");
-      else if (user.role === "investor" || user.role === "trader") setActiveTab("investor");
     }
   }, [user, authLoading, router]);
 
@@ -137,20 +150,48 @@ export default function UnifiedDashboard() {
     setTimeout(() => setRfqSubmitted(false), 4000);
   };
 
+  const handleSendChat = async (text?: string) => {
+    const queryToSend = text || chatQuery;
+    if (!queryToSend.trim()) return;
+
+    setChatMessages((prev) => [...prev, { role: "user", text: queryToSend }]);
+    setChatQuery("");
+    setChatLoading(true);
+
+    try {
+      const res = await askVoiceAssistant({
+        query: `${user?.role || "user"} inquiry: ${queryToSend}`,
+        crop: selectedCrop,
+        market: user?.location_name || "Jaipur",
+        state: "Rajasthan",
+      });
+      setChatMessages((prev) => [...prev, { role: "assistant", text: res.data.answer }]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "I'm having trouble processing that right now. Please try again." },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-          <p className="text-slate-900 font-bold text-sm">Loading KrishiMitra Unified Intelligence Dashboard...</p>
+          <p className="text-slate-900 font-bold text-sm">Loading Your Customized Dashboard...</p>
         </div>
       </div>
     );
   }
 
+  const userRole = (user?.role || "farmer").toLowerCase();
+
   return (
     <div className="space-y-8 animate-fade-in pb-12 font-sans">
-      {/* Welcome Hero Banner */}
+      {/* Role-Specific Hero Header */}
       <div className="relative rounded-3xl bg-slate-900 text-white p-8 sm:p-10 border border-slate-800 shadow-2xl overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-emerald-950/80 z-0 pointer-events-none" />
@@ -158,15 +199,18 @@ export default function UnifiedDashboard() {
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-emerald-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold mb-4 border border-emerald-400/30 text-emerald-300">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>Unified Agricultural Intelligence Engine</span>
+            <span>Dedicated Workspace: {userRole.toUpperCase()} PORTAL</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">
-            Welcome, {user?.full_name || "Agri User"}
+            Welcome back, {user?.full_name || "Partner"}
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed font-medium">
-            Access farm advisory, bulk buyer procurement, and investor yield analytics all in one place.
+            {userRole === "farmer" && "Your personalized farm advisory workspace — get real-time price recommendations, 5-day market forecasts, and storage timing."}
+            {userRole === "buyer" && "Your grain procurement portal — source verified crops directly from local growers and post bulk procurement orders."}
+            {userRole === "investor" && "Your agricultural investment dashboard — analyze commodity yield ROI, price volatility, and seasonal growth curves."}
+            {userRole === "trader" && "Your Mandi trading desk — track inter-mandi price arbitrage spreads, logistics freight, and real-time market rates."}
           </p>
 
           <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-300">
@@ -176,65 +220,18 @@ export default function UnifiedDashboard() {
             </div>
             <div className="flex items-center gap-1.5 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
               <ShieldCheck className="w-4 h-4 text-teal-400" />
-              <span>Account Type: {user?.role ? user.role.toUpperCase() : "AGRI USER"}</span>
+              <span>Stipulated Role: {userRole.toUpperCase()}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Unified Role Switcher Navigation Bar */}
-      <div className="bg-white rounded-3xl p-3 border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl border border-gray-200 w-full sm:w-auto">
-          <button
-            onClick={() => setActiveTab("farmer")}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition ${
-              activeTab === "farmer"
-                ? "bg-slate-900 text-white shadow"
-                : "text-gray-700 hover:text-gray-900"
-            }`}
-          >
-            <Leaf size={14} className={activeTab === "farmer" ? "text-emerald-400" : ""} />
-            <span>Farmer Advisory</span>
-          </button>
+      {/* STRICT ROLE ISOLATION DISPLAY */}
 
-          <button
-            onClick={() => setActiveTab("buyer")}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition ${
-              activeTab === "buyer"
-                ? "bg-slate-900 text-white shadow"
-                : "text-gray-700 hover:text-gray-900"
-            }`}
-          >
-            <ShoppingBag size={14} className={activeTab === "buyer" ? "text-emerald-400" : ""} />
-            <span>Buyer Procurement</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("investor")}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition ${
-              activeTab === "investor"
-                ? "bg-slate-900 text-white shadow"
-                : "text-gray-700 hover:text-gray-900"
-            }`}
-          >
-            <PieChart size={14} className={activeTab === "investor" ? "text-emerald-400" : ""} />
-            <span>Investor Analytics</span>
-          </button>
-        </div>
-
-        <Link
-          href="/voice-assistant"
-          className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 px-4 py-2.5 rounded-xl border border-purple-200 transition"
-        >
-          <Mic size={14} className="text-purple-600 animate-pulse" />
-          <span>Launch Gemini Voice Assistant</span>
-        </Link>
-      </div>
-
-      {/* TAB 1: FARMER ADVISORY */}
-      {activeTab === "farmer" && (
+      {/* 1. FARMER ROLE DASHBOARD */}
+      {userRole === "farmer" && (
         <div className="space-y-8 animate-fade-in">
-          {/* Quick Info Bar */}
+          {/* Quick Weather & Stats */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="border border-gray-200 shadow-sm bg-white rounded-2xl p-4 flex items-center gap-3">
               <div className="p-3 bg-amber-500 text-white rounded-xl shadow">
@@ -274,16 +271,16 @@ export default function UnifiedDashboard() {
                 <Mic className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase text-gray-500">Gemini Voice AI</p>
+                <p className="text-[11px] font-bold uppercase text-gray-500">Voice Assistant</p>
                 <Link href="/voice-assistant" className="text-xs font-black text-purple-700 underline">
-                  Ask AI Out Loud →
+                  Launch Assistant →
                 </Link>
                 <p className="text-[10px] text-gray-500 font-semibold">Speech in Hindi & English</p>
               </div>
             </Card>
           </div>
 
-          {/* Interactive Farmer Layout */}
+          {/* Farmer Advisory Tools */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-6">
               <Card className="border border-gray-200 shadow-lg rounded-2xl overflow-hidden bg-white">
@@ -316,9 +313,7 @@ export default function UnifiedDashboard() {
             <div className="lg:col-span-2 space-y-6">
               <Card className="border border-gray-200 shadow-lg rounded-2xl overflow-hidden bg-white">
                 <CardHeader className="bg-slate-900 text-white p-5">
-                  <CardTitle className="text-base font-bold flex items-center gap-2">
-                    Regional Mandi Prices
-                  </CardTitle>
+                  <CardTitle className="text-base font-bold">Regional Mandi Prices</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5">
                   <MarketPrices location={user?.location_name} />
@@ -343,8 +338,8 @@ export default function UnifiedDashboard() {
         </div>
       )}
 
-      {/* TAB 2: BUYER PROCUREMENT */}
-      {activeTab === "buyer" && (
+      {/* 2. BUYER ROLE DASHBOARD */}
+      {userRole === "buyer" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">
@@ -467,8 +462,8 @@ export default function UnifiedDashboard() {
         </div>
       )}
 
-      {/* TAB 3: INVESTOR ANALYTICS */}
-      {activeTab === "investor" && (
+      {/* 3. INVESTOR ROLE DASHBOARD */}
+      {userRole === "investor" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
           <div className="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl space-y-4">
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase">
@@ -552,6 +547,133 @@ export default function UnifiedDashboard() {
           </div>
         </div>
       )}
+
+      {/* 4. TRADER ROLE DASHBOARD */}
+      {userRole === "trader" && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-black text-gray-900">Real-Time Mandi Arbitrage Radar</h2>
+                <span className="text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">Live Feed</span>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { crop: "Mustard", origin: "Bharatpur Mandi", price1: 5620, dest: "Jaipur Mandi", price2: 5780, spread: 160 },
+                  { crop: "Wheat Sharbati", origin: "Kota Mandi", price1: 2390, dest: "Delhi Depot", price2: 2560, spread: 170 },
+                  { crop: "Soybean", origin: "Ujjain Mandi", price1: 4550, dest: "Indore Depot", price2: 4720, spread: 170 },
+                ].map((arb, idx) => (
+                  <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-900 text-sm">{arb.crop}</span>
+                      <span className="text-xs font-black bg-emerald-600 text-white px-2.5 py-0.5 rounded-md">
+                        Spread: +₹{arb.spread}/qtl
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-600 font-medium">
+                      <span>Origin: {arb.origin} (₹{arb.price1})</span>
+                      <span>Target: {arb.dest} (₹{arb.price2})</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Trader Logistics & Rates */}
+            <div className="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl space-y-4">
+              <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase">
+                <Truck size={16} /> Freight Freight Logistics Estimator
+              </div>
+              <h2 className="text-xl font-black">Logistics Route Costs</h2>
+              <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 space-y-3 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Jaipur to Bharatpur (180 km):</span>
+                  <span className="font-bold text-emerald-400">₹65 / qtl</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Kota to Delhi Hub (450 km):</span>
+                  <span className="font-bold text-emerald-400">₹120 / qtl</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Est. Transport Time:</span>
+                  <span className="font-bold text-white">12 - 24 Hours</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EMBEDDED VOICE CHATBOT FOR ALL ROLES */}
+      <Card className="border border-purple-200 shadow-xl bg-white rounded-3xl overflow-hidden mt-8">
+        <CardHeader className="bg-slate-900 text-white p-5 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bot className="text-purple-400" size={20} />
+            <CardTitle className="text-base font-bold">
+              AI Voice & Text Assistant ({userRole.toUpperCase()} Assistant)
+            </CardTitle>
+          </div>
+          <span className="text-xs font-bold bg-purple-900 text-purple-300 px-3 py-1 rounded-full border border-purple-700">
+            Voice AI Enabled
+          </span>
+        </CardHeader>
+        <CardContent className="p-5 space-y-4">
+          <div className="max-h-60 overflow-y-auto space-y-3 p-2">
+            {chatMessages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {msg.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-purple-900 text-purple-300 flex items-center justify-center font-bold text-xs shrink-0">
+                    <Bot size={16} />
+                  </div>
+                )}
+                <div
+                  className={`p-3 rounded-2xl text-xs max-w-[80%] ${
+                    msg.role === "user"
+                      ? "bg-purple-600 text-white font-medium"
+                      : "bg-gray-100 text-gray-900 font-medium"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+                {msg.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    <User size={16} />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {chatLoading && (
+              <div className="flex items-center gap-2 text-xs font-bold text-purple-700">
+                <Loader2 size={16} className="animate-spin text-purple-600" />
+                AI is generating response...
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 border-t border-gray-100 pt-3">
+            <input
+              type="text"
+              value={chatQuery}
+              onChange={(e) => setChatQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
+              placeholder={`Ask a question as a ${userRole}...`}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+            <button
+              onClick={() => handleSendChat()}
+              disabled={chatLoading || !chatQuery.trim()}
+              className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition disabled:opacity-50"
+            >
+              <Send size={14} /> Send
+            </button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
