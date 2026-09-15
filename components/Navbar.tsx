@@ -9,7 +9,7 @@ import {
   LayoutDashboard,
   TrendingUp,
   ShoppingBag,
-  LineChart,
+  PieChart,
   Newspaper,
   Brain,
   Mic,
@@ -19,26 +19,56 @@ import {
   Menu,
   X,
   Sparkles,
-  UserCheck,
   Building2,
-  PieChart,
 } from "lucide-react";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/sell-advisor", label: "Sell Advisor", icon: TrendingUp },
-  { href: "/buyer-portal", label: "Buyer Procurement", icon: ShoppingBag },
-  { href: "/investor-analytics", label: "Investor Analytics", icon: PieChart },
-  { href: "/market-intelligence", label: "Market Feed", icon: Newspaper },
-  { href: "/explainable-ai", label: "AI Insights", icon: Brain },
-  { href: "/voice-assistant", label: "Voice Assistant", icon: Mic },
-  { href: "/storage-advisor", label: "Storage Advisor", icon: Warehouse },
-];
 
 export function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const role = (user?.role || "farmer").toLowerCase();
+
+  // Role-Isolated Navigation Items
+  const getNavItems = () => {
+    if (role === "buyer") {
+      return [
+        { href: "/dashboard", label: "Procurement Hub", icon: LayoutDashboard },
+        { href: "/buyer-portal", label: "Harvest Inventory", icon: ShoppingBag },
+        { href: "/market-intelligence", label: "Market Rates", icon: Newspaper },
+        { href: "/voice-assistant", label: "Voice AI", icon: Mic },
+      ];
+    }
+    if (role === "investor") {
+      return [
+        { href: "/dashboard", label: "Investor Portal", icon: LayoutDashboard },
+        { href: "/investor-analytics", label: "Commodity Analytics", icon: PieChart },
+        { href: "/market-intelligence", label: "Market Rates", icon: Newspaper },
+        { href: "/explainable-ai", label: "Market Signals", icon: Brain },
+        { href: "/voice-assistant", label: "Voice AI", icon: Mic },
+      ];
+    }
+    if (role === "trader") {
+      return [
+        { href: "/dashboard", label: "Trading Desk", icon: LayoutDashboard },
+        { href: "/market-intelligence", label: "Market Rates", icon: Newspaper },
+        { href: "/explainable-ai", label: "Price Spreads", icon: Brain },
+        { href: "/voice-assistant", label: "Voice AI", icon: Mic },
+      ];
+    }
+    // Default: Farmer
+    return [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/sell-advisor", label: "Sell Advisor", icon: TrendingUp },
+      { href: "/buyer-recommendations", label: "Buyer Matches", icon: ShoppingBag },
+      { href: "/storage-advisor", label: "Storage Advisor", icon: Warehouse },
+      { href: "/market-intelligence", label: "Market Feed", icon: Newspaper },
+      { href: "/explainable-ai", label: "AI Insights", icon: Brain },
+      { href: "/voice-assistant", label: "Voice AI", icon: Mic },
+    ];
+  };
+
+  const navItems = getNavItems();
 
   return (
     <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-emerald-900/40 shadow-xl text-white">
@@ -59,7 +89,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-2 text-[11px] font-bold text-emerald-400">
-          <Building2 size={13} /> Multi-Role Agri Platform
+          <Building2 size={13} /> {role.toUpperCase()} WORKSPACE
         </div>
       </div>
 
@@ -75,21 +105,21 @@ export function Navbar() {
                 Krishi<span className="text-emerald-400">Mitra</span>
               </span>
               <span className="text-[10px] font-extrabold text-emerald-400 tracking-widest uppercase block">
-                Agri Advisory & Intelligence
+                Agri Advisory & Multi-Role Ecosystem
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
+          {/* Role-Filtered Desktop Navigation Links */}
           {user && (
             <nav className="hidden lg:flex items-center gap-1">
-              {NAV_ITEMS.slice(0, 7).map(({ href, label, icon: Icon }) => {
+              {navItems.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href;
                 return (
                   <Link
                     key={href}
                     href={href}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
                       active
                         ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-sm"
                         : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -125,7 +155,7 @@ export function Navbar() {
                     </p>
                     <p className="text-[10px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5">
                       <MapPin className="h-2.5 w-2.5 inline" />
-                      {user.role ? user.role.toUpperCase() : "FARMER"} • {user.location_name || "India"}
+                      {role.toUpperCase()} • {user.location_name || "India"}
                     </p>
                   </div>
                 </div>
@@ -188,11 +218,11 @@ export function Navbar() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-white">{user.full_name || "Agri User"}</p>
-                  <p className="text-xs text-emerald-400 font-semibold">{user.role?.toUpperCase() || "USER"} • {user.location_name || "India"}</p>
+                  <p className="text-xs text-emerald-400 font-semibold">{role.toUpperCase()} • {user.location_name || "India"}</p>
                 </div>
               </div>
 
-              {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+              {navItems.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href;
                 return (
                   <Link
