@@ -44,9 +44,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      console.warn("Submit error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +58,8 @@ export default function LoginPage() {
 
     try {
       await loginWithGoogle(accountEmail, accountName);
-      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Google Sign-In failed.");
+      console.warn("Google login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +79,8 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(roleEmail, "password123");
-      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Demo login failed.");
+      console.warn("Demo login error:", err);
     } finally {
       setIsLoading(false);
     }
