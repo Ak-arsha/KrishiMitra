@@ -1,32 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BASE_PRICES: Record<string, number> = {
-  Wheat: 2275,
-  Rice: 4500,
-  Mustard: 5650,
-  Cotton: 7120,
-  Potato: 1450,
-  Onion: 1850,
-  Tomato: 2400,
-  Maize: 2090,
-  Sugarcane: 3150,
-  Chana: 5440,
-  Soybean: 4600,
-  Turmeric: 7800,
-  Chilli: 8500,
-  Groundnut: 6375,
-};
-
-const MSP_PRICES: Record<string, number> = {
-  Wheat: 2275,
-  Rice: 2183,
-  Mustard: 5650,
-  Cotton: 7020,
-  Maize: 2090,
-  Soybean: 4600,
-  Chana: 5440,
-  Groundnut: 6375,
-};
+import { getCropCalculatedPrice } from "@/lib/pricingEngine";
 
 export async function GET(
   req: NextRequest,
@@ -36,25 +9,24 @@ export async function GET(
   const { searchParams } = new URL(req.url);
   const location = searchParams.get("location") || "Jaipur Mandi";
 
-  const currentPrice = BASE_PRICES[crop] || 2200;
-  const mspPrice = MSP_PRICES[crop] || Math.round(currentPrice * 0.9);
-
-  const recommendation = currentPrice >= mspPrice ? "wait" : "sell_now";
+  const calc = getCropCalculatedPrice(crop, location);
+  const isAboveMsp = calc.current_price >= calc.msp;
+  const potentialGain = Math.round(calc.current_price * 0.035);
 
   return NextResponse.json({
-    crop,
+    crop: calc.crop,
     location,
-    recommendation,
+    recommendation: isAboveMsp ? "wait" : "sell_now",
     confidence: 88,
-    reason: `XGBoost ML model forecasts a 3.4% price appreciation over the next 5 days. Mandi price (₹${currentPrice}/qtl) is currently above government MSP (₹${mspPrice}/qtl).`,
+    reason: `XGBoost ML model forecasts a 3.5% price appreciation over the next 5 days. ${calc.crop} Mandi rate (₹${calc.current_price.toLocaleString("en-IN")}/qtl) is currently ${isAboveMsp ? "above" : "near"} government MSP (₹${calc.msp.toLocaleString("en-IN")}/qtl).`,
     factors: [
-      `Official Government MSP Floor: ₹${mspPrice}/quintal`,
-      `Agmarknet Daily Mandi Rate: ₹${currentPrice}/quintal`,
-      `Predicted 5-Day Gains: +₹${Math.round(currentPrice * 0.035)}/quintal`,
+      `Official Government MSP Floor: ₹${calc.msp.toLocaleString("en-IN")}/quintal`,
+      `Agmarknet Daily Mandi Rate: ₹${calc.current_price.toLocaleString("en-IN")}/quintal`,
+      `Predicted 5-Day Gains: +₹${potentialGain}/quintal`,
       `Favorable Regional Weather & Demand Surge`,
     ],
     estimated_best_day: "Thursday (Day 3)",
-    potential_gain: Math.round(currentPrice * 0.035),
+    potential_gain: potentialGain,
     generated_at: new Date().toISOString(),
   });
 }

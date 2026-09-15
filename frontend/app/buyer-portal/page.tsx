@@ -54,7 +54,7 @@ export default function BuyerPortalPage() {
       variety: "JS 335",
       grade: "Standard",
       quantityQuintals: 450,
-      askingPrice: 4620,
+      askingPrice: 4650,
       harvestDate: "Aug 2026",
       moistureContent: "10.2%",
       certifiedOrganic: false,
@@ -69,7 +69,7 @@ export default function BuyerPortalPage() {
       variety: "Pusa Bold",
       grade: "Grade A+",
       quantityQuintals: 320,
-      askingPrice: 5750,
+      askingPrice: 5720,
       harvestDate: "Sep 2026",
       moistureContent: "8.0%",
       certifiedOrganic: true,
@@ -84,11 +84,56 @@ export default function BuyerPortalPage() {
       variety: "Basmati 1121",
       grade: "Export Quality",
       quantityQuintals: 600,
-      askingPrice: 3850,
+      askingPrice: 2183,
       harvestDate: "Sep 2026",
       moistureContent: "12.0%",
       certifiedOrganic: false,
       phone: "+91 91160 54321",
+    },
+    {
+      id: "INV-105",
+      farmerName: "Ramesh Choudhary",
+      location: "Amritsar, Punjab",
+      distanceKm: 240,
+      crop: "Rice",
+      variety: "Super Basmati",
+      grade: "Grade A+",
+      quantityQuintals: 500,
+      askingPrice: 4500,
+      harvestDate: "Aug 2026",
+      moistureContent: "11.0%",
+      certifiedOrganic: true,
+      phone: "+91 98150 98765",
+    },
+    {
+      id: "INV-106",
+      farmerName: "Balwant Rao",
+      location: "Nashik, Maharashtra",
+      distanceKm: 310,
+      crop: "Tomato",
+      variety: "Hybrid Red",
+      grade: "Grade A",
+      quantityQuintals: 180,
+      askingPrice: 3400,
+      harvestDate: "Sep 2026",
+      moistureContent: "88.0%",
+      certifiedOrganic: false,
+      phone: "+91 98220 44332",
+    },
+    {
+      id: "INV-107",
+      farmerName: "Sanjay Deshmukh",
+      location: "Nashik, Maharashtra",
+      distanceKm: 290,
+      crop: "Onion",
+      variety: "Lasalgaon Pink",
+      grade: "Grade A+",
+      quantityQuintals: 750,
+      askingPrice: 1850,
+      harvestDate: "Sep 2026",
+      moistureContent: "14.0%",
+      certifiedOrganic: true,
+      phone: "+91 97630 11223",
     },
   ];
 
@@ -151,7 +196,7 @@ export default function BuyerPortalPage() {
 
               {/* Crop Filter */}
               <div className="flex gap-2 overflow-x-auto pb-1">
-                {["All", "Wheat", "Mustard", "Soybean", "Paddy"].map((crop) => (
+                {["All", "Wheat", "Mustard", "Soybean", "Paddy", "Rice", "Tomato", "Onion"].map((crop) => (
                   <button
                     key={crop}
                     onClick={() => setSelectedCrop(crop)}
@@ -213,7 +258,7 @@ export default function BuyerPortalPage() {
                       className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow"
                     >
                       <PhoneCall className="w-3.5 h-3.5" />
-                      <span>Contact Farmer</span>
+                      <span>Contact Farmer ({item.phone})</span>
                     </a>
                   </div>
                 </div>
@@ -246,11 +291,13 @@ export default function BuyerPortalPage() {
                   onChange={(e) => setRfqForm({ ...rfqForm, crop: e.target.value })}
                   className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 >
-                  <option value="Wheat">Wheat (Wheat Grain)</option>
+                  <option value="Wheat">Wheat (Grain)</option>
                   <option value="Mustard">Mustard (Black/Yellow)</option>
                   <option value="Soybean">Soybean</option>
                   <option value="Paddy">Paddy / Rice</option>
-                  <option value="Corn">Maize / Corn</option>
+                  <option value="Tomato">Tomato</option>
+                  <option value="Onion">Onion</option>
+                  <option value="Chana">Chana / Gram</option>
                 </select>
               </div>
 

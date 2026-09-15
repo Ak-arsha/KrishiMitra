@@ -23,11 +23,16 @@ export default function InvestorAnalyticsPage() {
   const [holdingMonths, setHoldingMonths] = useState(3);
 
   const CROP_MODELS: Record<string, { expectedRoiPct: number; riskLevel: string; volatilityScore: number; forecastTrend: string }> = {
-    Mustard: { expectedRoiPct: 14.8, riskLevel: "Moderate", volatilityScore: 4.2, forecastTrend: "Strong Bullish (+12% in 90 days)" },
+    Mustard: { expectedRoiPct: 14.8, riskLevel: "Moderate Risk", volatilityScore: 4.2, forecastTrend: "Strong Bullish (+12% in 90 days)" },
     Wheat: { expectedRoiPct: 8.5, riskLevel: "Low / Stable", volatilityScore: 2.1, forecastTrend: "Steady Growth (+6% in 90 days)" },
+    Rice: { expectedRoiPct: 9.2, riskLevel: "Low / Stable", volatilityScore: 2.4, forecastTrend: "Export Demand Support" },
     Soybean: { expectedRoiPct: 18.2, riskLevel: "High Volatility", volatilityScore: 7.8, forecastTrend: "Cyclical Rebound (+15% in 90 days)" },
-    Paddy: { expectedRoiPct: 7.2, riskLevel: "Government Backed (MSP)", volatilityScore: 1.5, forecastTrend: "Stable Price Floor" },
+    Paddy: { expectedRoiPct: 7.2, riskLevel: "MSP Protected", volatilityScore: 1.5, forecastTrend: "Government Floor Price" },
     Tomato: { expectedRoiPct: 24.5, riskLevel: "High Risk / High Return", volatilityScore: 8.9, forecastTrend: "High Spikes Expected" },
+    Cotton: { expectedRoiPct: 13.5, riskLevel: "Moderate Risk", volatilityScore: 5.1, forecastTrend: "Textile Demand Lift" },
+    Chana: { expectedRoiPct: 10.4, riskLevel: "Low / Stable", volatilityScore: 3.0, forecastTrend: "Pulse Procurement Buffer" },
+    Onion: { expectedRoiPct: 21.0, riskLevel: "High Volatility", volatilityScore: 8.2, forecastTrend: "Monsoon Supply Fluctuation" },
+    Potato: { expectedRoiPct: 9.8, riskLevel: "Moderate Risk", volatilityScore: 4.0, forecastTrend: "Cold Chain Storage Gain" },
   };
 
   const selectedModel = CROP_MODELS[selectedCrop] || CROP_MODELS["Mustard"];
@@ -64,6 +69,16 @@ export default function InvestorAnalyticsPage() {
       spreadPerQtl: 170,
       netRoiAfterFreight: 8.8,
       status: "Stable",
+    },
+    {
+      crop: "Tomato",
+      buyMandi: "Nashik APMC",
+      buyPrice: 2750,
+      sellMandi: "Mumbai Vashi Wholesale",
+      sellPrice: 3400,
+      spreadPerQtl: 650,
+      netRoiAfterFreight: 18.5,
+      status: "High Opportunity",
     },
   ];
 
@@ -119,11 +134,11 @@ export default function InvestorAnalyticsPage() {
                 onChange={(e) => setSelectedCrop(e.target.value)}
                 className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
-                <option value="Mustard">Mustard (Oilseed)</option>
-                <option value="Wheat">Wheat (Grain)</option>
-                <option value="Soybean">Soybean</option>
-                <option value="Paddy">Paddy / Rice</option>
-                <option value="Tomato">Tomato (Horticulture)</option>
+                {Object.keys(CROP_MODELS).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
 
