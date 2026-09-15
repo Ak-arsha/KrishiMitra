@@ -48,28 +48,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
+    const lowerEmail = (email || "").toLowerCase();
+    let role = "farmer";
+    if (lowerEmail.includes("buyer")) role = "buyer";
+    else if (lowerEmail.includes("investor")) role = "investor";
+    else if (lowerEmail.includes("trader")) role = "trader";
+
     try {
-      const response = await loginUser({ email, password });
+      const response = await loginUser({ email, password, role });
       const data = response.data;
+
+      const finalUser: User = {
+        ...data.user,
+        role: data.user?.role || role,
+      };
+
       setToken(data.access_token);
-      setUser(data.user);
+      setUser(finalUser);
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("farmer", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(finalUser));
+      localStorage.setItem("farmer", JSON.stringify(finalUser));
       router.push("/dashboard");
     } catch (error: any) {
       console.warn("API login fallback engaged:", error);
-      // Fail-safe login for production deployment
-      const lowerEmail = (email || "").toLowerCase();
-      let role = "farmer";
-      if (lowerEmail.includes("buyer")) role = "buyer";
-      else if (lowerEmail.includes("investor")) role = "investor";
-      else if (lowerEmail.includes("trader")) role = "trader";
 
       const fallbackUser: User = {
         id: `u-${Date.now()}`,
         email: email || "farmer@example.com",
-        full_name: email.split("@")[0].toUpperCase() || "Akarsha Agarwal",
+        full_name: email.split("@")[0] ? email.split("@")[0].toUpperCase() : "Akarsha Agarwal",
         location_name: "Jaipur, Rajasthan",
         role,
       };
@@ -89,23 +95,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     const email = customEmail || "akarshaagarwal25@gmail.com";
     const full_name = customName || "Akarsha Agarwal";
+    const lowerEmail = email.toLowerCase();
+
+    let role = "farmer";
+    if (lowerEmail.includes("buyer")) role = "buyer";
+    else if (lowerEmail.includes("investor")) role = "investor";
+    else if (lowerEmail.includes("trader")) role = "trader";
 
     try {
-      const response = await googleLoginUser({ email, full_name });
+      const response = await googleLoginUser({ email, full_name, role });
       const data = response.data;
+
+      const finalUser: User = {
+        ...data.user,
+        role: data.user?.role || role,
+      };
+
       setToken(data.access_token);
-      setUser(data.user);
+      setUser(finalUser);
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("farmer", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(finalUser));
+      localStorage.setItem("farmer", JSON.stringify(finalUser));
       router.push("/dashboard");
     } catch (error: any) {
       console.warn("Google login fallback engaged:", error);
-      const lowerEmail = email.toLowerCase();
-      let role = "farmer";
-      if (lowerEmail.includes("buyer")) role = "buyer";
-      else if (lowerEmail.includes("investor")) role = "investor";
-      else if (lowerEmail.includes("trader")) role = "trader";
 
       const fallbackUser: User = {
         id: `u-google-${Date.now()}`,
@@ -158,12 +171,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const detail = error.response?.data?.detail;
       const message = typeof detail === "string" ? detail : (Array.isArray(detail) ? detail[0]?.msg : "Registration failed. Please try again.");
       
-      // If error is duplicate email, throw error so UI displays red banner
       if (message.includes("already exists")) {
         throw new Error(message);
       }
 
-      // Otherwise fallback to instant registration session
       const fallbackUser: User = {
         id: `u-reg-${Date.now()}`,
         email,
