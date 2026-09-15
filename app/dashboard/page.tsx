@@ -39,6 +39,7 @@ import CropInput from "@/components/CropInput";
 import MarketPrices from "@/components/MarketPrices";
 import PriceForecast from "@/components/PriceForecast";
 import SellRecommendation from "@/components/SellRecommendation";
+import { DynamicGreetingBar } from "@/components/DynamicGreetingBar";
 import { useAuth } from "@/app/context/AuthContext";
 import { askVoiceAssistant } from "@/lib/api";
 
@@ -191,40 +192,8 @@ export default function RoleIsolatedDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in pb-12 font-sans">
-      {/* Role-Specific Hero Header */}
-      <div className="relative rounded-3xl bg-slate-900 text-white p-8 sm:p-10 border border-slate-800 shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-emerald-950/80 z-0 pointer-events-none" />
-
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold mb-4 border border-emerald-400/30 text-emerald-300">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>Dedicated Workspace: {userRole.toUpperCase()} PORTAL</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">
-            Welcome back, {user?.full_name || "Partner"}
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed font-medium">
-            {userRole === "farmer" && "Your personalized farm advisory workspace — get real-time price recommendations, 5-day market forecasts, and storage timing."}
-            {userRole === "buyer" && "Your grain procurement portal — source verified crops directly from local growers and post bulk procurement orders."}
-            {userRole === "investor" && "Your agricultural investment dashboard — analyze commodity yield ROI, price volatility, and seasonal growth curves."}
-            {userRole === "trader" && "Your Mandi trading desk — track inter-mandi price arbitrage spreads, logistics freight, and real-time market rates."}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-300">
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>Location: {user?.location_name || "Rajasthan, India"}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
-              <ShieldCheck className="w-4 h-4 text-teal-400" />
-              <span>Stipulated Role: {userRole.toUpperCase()}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Role-Specific Personalized Greeting & Live Weather Ticker */}
+      <DynamicGreetingBar />
 
       {/* STRICT ROLE ISOLATION DISPLAY */}
 
