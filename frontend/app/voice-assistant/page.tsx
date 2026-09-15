@@ -7,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { askVoiceAssistant } from "@/lib/api";
 import { CROPS, MARKETS } from "@/lib/utils";
@@ -20,9 +19,12 @@ import {
   Bot,
   User,
   Volume2,
+  VolumeX,
   Globe,
+  CheckCircle2,
   MessageSquare,
-  Sparkle,
+  ShieldCheck,
+  Building2,
 } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; text: string; time?: string };
@@ -31,23 +33,25 @@ export default function VoiceAssistantPage() {
   const [query, setQuery] = useState("");
   const [crop, setCrop] = useState("Wheat");
   const [market, setMarket] = useState("Jaipur");
+  const [roleContext, setRoleContext] = useState("Farmer");
   const [language, setLanguage] = useState("en-IN");
   const [listening, setListening] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      text: "Namaste! I am your AI KrishiMitra Assistant powered by Gemini. Ask me anything about crop prices, selling timing, or storage techniques!",
+      text: "Namaste! I am your AI KrishiMitra Assistant powered by Gemini. Ask me any question about crop price forecasts, bulk buyer procurement, or investor yield analytics!",
       time: "Just now",
     },
   ]);
   const recognitionRef = useRef<any>(null);
 
   const SUGGESTED_QUERIES = [
-    "What is the best time to sell Wheat in Rajasthan?",
-    "Should I store Mustard for 30 days?",
-    "Compare Wheat MSP price with current Mandi rates",
-    "How to protect stored Paddy from insects?",
+    "What is the best time to sell Wheat in Rajasthan Mandi?",
+    "Show bulk buyer procurement demand for Mustard",
+    "What is the projected ROI for 3-month Soybean holding?",
+    "Compare Wheat MSP rate with current APMC Mandi prices",
   ];
 
   const toggleListening = () => {
@@ -57,7 +61,7 @@ export default function VoiceAssistantPage() {
 
     if (!SpeechRecognition) {
       alert(
-        "Voice input isn't supported in this browser window. Please type your question or use Chrome."
+        "Voice input is not supported in this browser window. Please type your question or use Chrome."
       );
       return;
     }
@@ -83,6 +87,21 @@ export default function VoiceAssistantPage() {
     setListening(true);
   };
 
+  const speakText = (text: string) => {
+    if (!("speechSynthesis" in window)) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSend = async (customQuery?: string) => {
     const textToSend = customQuery || query;
     if (!textToSend.trim()) return;
@@ -103,29 +122,33 @@ export default function VoiceAssistantPage() {
     try {
       const state = MARKETS[market] || "Rajasthan";
       const res = await askVoiceAssistant({
-        query: textToSend,
+        query: `${roleContext} perspective: ${textToSend}`,
         crop,
         market,
         state,
       });
 
+      const aiAnswer = res.data.answer;
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
-          text: res.data.answer,
+          text: aiAnswer,
           time: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           }),
         },
       ]);
+
+      // Automatically speak the response
+      speakText(aiAnswer);
     } catch {
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
-          text: "I couldn't process that query right now — please check your backend server.",
+          text: "Currently unable to reach speech processing service. Please ensure server connectivity.",
           time: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -138,42 +161,53 @@ export default function VoiceAssistantPage() {
   };
 
   return (
-    <div className="space-y-8 pb-12 max-w-5xl mx-auto">
+    <div className="space-y-8 pb-12 max-w-5xl mx-auto font-sans">
       {/* Header Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-950 p-8 text-white shadow-2xl"
-      >
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white shadow-2xl border border-slate-800">
         <div className="absolute right-0 top-0 -mr-16 -mt-16 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-400/20 border border-purple-400/30 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-4">
-            <Sparkles size={14} className="animate-spin" /> Gemini AI LLM Assistant
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs font-bold uppercase tracking-wider mb-4">
+            <Sparkles size={14} className="animate-spin text-purple-400" /> Gemini AI Multilingual Speech Engine
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">
-            Multilingual Voice Assistant 🎙️
+            AI Speech & Multilingual Assistant
           </h1>
-          <p className="text-purple-100/90 text-sm sm:text-base leading-relaxed">
-            Ask any farming or Mandi price question out loud or in text. Powered by Google Gemini AI with context-aware agricultural data.
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-medium">
+            Ask any agricultural, buyer procurement, or investment question out loud or via text. Supports speech recognition and audio readout in multiple Indian languages.
           </p>
         </div>
-      </motion.div>
+      </div>
 
       {/* Context Selection Bar */}
-      <Card className="border border-purple-100 shadow-xl bg-white/90 backdrop-blur-md rounded-2xl p-6">
-        <div className="grid gap-4 sm:grid-cols-3">
+      <Card className="border border-gray-200 shadow-sm bg-white rounded-2xl p-6">
+        <div className="grid gap-4 sm:grid-cols-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
-              Context Crop
+              Persona / Role Context
+            </label>
+            <select
+              value={roleContext}
+              onChange={(e) => setRoleContext(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs"
+            >
+              <option value="Farmer">🌾 Farmer (Crop & Mandi Advice)</option>
+              <option value="Buyer">🤝 Buyer (Procurement & Bulk Sourcing)</option>
+              <option value="Investor">📈 Investor (Yield ROI & Volatility)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+              Target Commodity
             </label>
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs"
             >
               {CROPS.map((c) => (
                 <option key={c} value={c}>
-                  🌾 {c}
+                  {c}
                 </option>
               ))}
             </select>
@@ -181,16 +215,16 @@ export default function VoiceAssistantPage() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
-              Context Mandi
+              Target Mandi
             </label>
             <select
               value={market}
               onChange={(e) => setMarket(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs"
             >
               {Object.keys(MARKETS).map((m) => (
                 <option key={m} value={m}>
-                  📍 {m} ({MARKETS[m]})
+                  {m} ({MARKETS[m]})
                 </option>
               ))}
             </select>
@@ -198,33 +232,40 @@ export default function VoiceAssistantPage() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
-              Voice Language
+              Speech Language
             </label>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
+              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs"
             >
-              <option value="en-IN">🌐 English (India)</option>
-              <option value="hi-IN">🇮🇳 Hindi (हिंदी)</option>
-              <option value="pa-IN">🌾 Punjabi (ਪੰਜਾਬੀ)</option>
+              <option value="en-IN">English (India)</option>
+              <option value="hi-IN">Hindi (हिंदी)</option>
+              <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
             </select>
           </div>
         </div>
       </Card>
 
       {/* Chat Container */}
-      <Card className="border border-purple-100 shadow-xl bg-white rounded-2xl overflow-hidden flex flex-col h-[520px]">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100 py-4 px-6 flex items-center justify-between">
+      <Card className="border border-gray-200 shadow-lg bg-white rounded-3xl overflow-hidden flex flex-col h-[540px]">
+        <CardHeader className="bg-slate-900 text-white border-b border-slate-800 py-4 px-6 flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bot className="text-purple-700" size={20} />
-            <CardTitle className="text-base font-bold text-gray-800">
-              Live Advisory Chat Conversation
+            <Bot className="text-purple-400" size={20} />
+            <CardTitle className="text-base font-bold">
+              Gemini Conversational Advisory Stream
             </CardTitle>
           </div>
-          <span className="text-xs font-bold text-purple-700 px-2.5 py-1 bg-purple-100 rounded-full">
-            Gemini Flash 2.0
-          </span>
+          <div className="flex items-center gap-2">
+            {isSpeaking && (
+              <span className="text-xs font-bold bg-purple-500/30 text-purple-300 px-3 py-1 rounded-full border border-purple-400/40 flex items-center gap-1.5 animate-pulse">
+                <Volume2 size={14} /> Audio Playing...
+              </span>
+            )}
+            <span className="text-xs font-bold text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-800">
+              Active Mode: {roleContext}
+            </span>
+          </div>
         </CardHeader>
 
         {/* Message Feed */}
@@ -240,7 +281,7 @@ export default function VoiceAssistantPage() {
                 }`}
               >
                 {m.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs shadow shrink-0">
+                  <div className="w-9 h-9 rounded-2xl bg-purple-900 text-purple-300 border border-purple-700 flex items-center justify-center font-bold text-xs shadow shrink-0">
                     <Bot size={18} />
                   </div>
                 )}
@@ -249,23 +290,34 @@ export default function VoiceAssistantPage() {
                   className={`max-w-[80%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed ${
                     m.role === "user"
                       ? "bg-purple-600 text-white font-medium rounded-tr-none"
-                      : "bg-gray-50 border border-gray-100 text-gray-800 font-normal rounded-tl-none"
+                      : "bg-gray-50 border border-gray-200 text-gray-900 font-medium rounded-tl-none"
                   }`}
                 >
                   <p className="whitespace-pre-line">{m.text}</p>
-                  {m.time && (
-                    <div
-                      className={`text-[10px] mt-1.5 text-right ${
-                        m.role === "user" ? "text-purple-200" : "text-gray-400"
-                      }`}
-                    >
-                      {m.time}
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200/40">
+                    {m.time && (
+                      <span
+                        className={`text-[10px] ${
+                          m.role === "user" ? "text-purple-200" : "text-gray-400"
+                        }`}
+                      >
+                        {m.time}
+                      </span>
+                    )}
+
+                    {m.role === "assistant" && (
+                      <button
+                        onClick={() => speakText(m.text)}
+                        className="text-xs text-purple-700 font-bold hover:text-purple-900 flex items-center gap-1 ml-auto"
+                      >
+                        <Volume2 size={13} /> Speak Readout
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {m.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow shrink-0">
+                  <div className="w-9 h-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow shrink-0">
                     <User size={18} />
                   </div>
                 )}
@@ -274,26 +326,26 @@ export default function VoiceAssistantPage() {
           </AnimatePresence>
 
           {loading && (
-            <div className="flex items-center gap-3 text-purple-700 text-sm font-semibold">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                <Loader2 className="animate-spin" size={18} />
+            <div className="flex items-center gap-3 text-purple-700 text-xs font-bold">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center">
+                <Loader2 className="animate-spin text-purple-600" size={18} />
               </div>
-              Gemini AI is analyzing Mandi data & generating response...
+              Synthesizing response for {roleContext} perspective...
             </div>
           )}
         </CardContent>
 
         {/* Input Bar */}
-        <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
+        <div className="p-4 bg-gray-50 border-t border-gray-200 space-y-3">
           {/* Quick Query Chips */}
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             {SUGGESTED_QUERIES.map((sq, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(sq)}
-                className="whitespace-nowrap px-3 py-1 bg-white border border-purple-200 text-purple-900 rounded-full text-xs font-semibold hover:bg-purple-50 transition shrink-0"
+                className="whitespace-nowrap px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-full text-xs font-semibold hover:border-purple-400 hover:text-purple-700 transition shrink-0"
               >
-                💡 {sq}
+                {sq}
               </button>
             ))}
           </div>
@@ -301,9 +353,9 @@ export default function VoiceAssistantPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleListening}
-              className={`p-3.5 rounded-xl font-bold transition flex items-center justify-center shrink-0 ${
+              className={`p-3.5 rounded-2xl font-bold transition flex items-center justify-center shrink-0 ${
                 listening
-                  ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-200"
+                  ? "bg-rose-600 text-white animate-pulse shadow-lg"
                   : "bg-white border border-gray-300 text-purple-700 hover:bg-purple-50 shadow-sm"
               }`}
             >
@@ -318,15 +370,15 @@ export default function VoiceAssistantPage() {
               placeholder={
                 listening
                   ? "Listening... Speak your question now"
-                  : "Type or speak your crop / Mandi question..."
+                  : `Type or speak your question as a ${roleContext}...`
               }
-              className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-800 font-medium focus:ring-2 focus:ring-purple-500 focus:outline-none shadow-sm"
+              className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-2xl text-sm text-gray-900 font-medium focus:ring-2 focus:ring-purple-500 focus:outline-none shadow-sm"
             />
 
             <button
               onClick={() => handleSend()}
               disabled={loading || !query.trim()}
-              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl shadow-md transition disabled:opacity-50 flex items-center gap-2 shrink-0"
+              className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition disabled:opacity-50 flex items-center gap-2 shrink-0"
             >
               <Send size={16} /> Send
             </button>

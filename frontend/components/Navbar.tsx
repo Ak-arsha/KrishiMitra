@@ -8,7 +8,8 @@ import {
   Leaf,
   LayoutDashboard,
   TrendingUp,
-  Users,
+  ShoppingBag,
+  LineChart,
   Newspaper,
   Brain,
   Mic,
@@ -18,17 +19,20 @@ import {
   Menu,
   X,
   Sparkles,
-  Volume2,
+  UserCheck,
+  Building2,
+  PieChart,
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "डैशबोर्ड / Dashboard", icon: LayoutDashboard },
-  { href: "/sell-advisor", label: "कब बेचें? / Sell Advisor", icon: TrendingUp },
-  { href: "/buyer-recommendations", label: "खरीदार / Buyers", icon: Users },
-  { href: "/market-intelligence", label: "मंडी भाव / Market Feed", icon: Newspaper },
-  { href: "/explainable-ai", label: "कारण समझें / AI Insights", icon: Brain },
-  { href: "/voice-assistant", label: "आवाज़ सहायक / Voice", icon: Mic },
-  { href: "/storage-advisor", label: "भंडारण / Storage", icon: Warehouse },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/sell-advisor", label: "Sell Advisor", icon: TrendingUp },
+  { href: "/buyer-portal", label: "Buyer Procurement", icon: ShoppingBag },
+  { href: "/investor-analytics", label: "Investor Analytics", icon: PieChart },
+  { href: "/market-intelligence", label: "Market Feed", icon: Newspaper },
+  { href: "/explainable-ai", label: "AI Insights", icon: Brain },
+  { href: "/voice-assistant", label: "Voice Assistant", icon: Mic },
+  { href: "/storage-advisor", label: "Storage Advisor", icon: Warehouse },
 ];
 
 export function Navbar() {
@@ -37,21 +41,25 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-md">
-      {/* Top Ticker Bar */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-900 to-green-950 text-white text-xs font-semibold py-1.5 px-4 overflow-hidden flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-emerald-900/40 shadow-xl text-white">
+      {/* Top Live Mandi Ticker Bar */}
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/30 text-xs font-semibold py-1.5 px-4 overflow-hidden flex items-center justify-between">
         <div className="flex items-center gap-2 shrink-0">
-          <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider border border-emerald-400/30 flex items-center gap-1">
-            <Sparkles size={12} className="animate-spin" /> LIVE MANDI RATES
+          <span className="bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider border border-emerald-400/30 flex items-center gap-1.5">
+            <Sparkles size={12} className="animate-spin text-emerald-400" /> LIVE APMC RATES
           </span>
         </div>
 
-        <div className="truncate text-emerald-100/90 font-medium px-4 text-center">
-          🌾 गेहूँ (Wheat): ₹2,450 (+₹45) | 🌾 धान (Paddy): ₹2,183 (MSP) | 🌼 सरसों (Mustard): ₹5,720 (+₹80) | 🫘 सोयाबीन (Soybean): ₹4,650
+        <div className="truncate text-slate-300 font-medium px-4 text-center text-[11px] sm:text-xs">
+          <span className="text-emerald-400 font-bold">Wheat:</span> ₹2,450/qtl (+₹45) &nbsp;|&nbsp;{" "}
+          <span className="text-emerald-400 font-bold">Paddy:</span> ₹2,183/qtl (MSP) &nbsp;|&nbsp;{" "}
+          <span className="text-emerald-400 font-bold">Mustard:</span> ₹5,720/qtl (+₹80) &nbsp;|&nbsp;{" "}
+          <span className="text-emerald-400 font-bold">Soybean:</span> ₹4,650/qtl &nbsp;|&nbsp;{" "}
+          <span className="text-emerald-400 font-bold">Tomato:</span> ₹3,400/qtl (+₹150)
         </div>
 
-        <div className="hidden md:flex items-center gap-1 text-[11px] font-bold text-amber-300">
-          🇮🇳 kisan.mitra@ai
+        <div className="hidden md:flex items-center gap-2 text-[11px] font-bold text-emerald-400">
+          <Building2 size={13} /> Multi-Role Agri Platform
         </div>
       </div>
 
@@ -59,15 +67,15 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
-            <div className="p-2.5 bg-gradient-to-tr from-emerald-600 via-green-600 to-teal-500 rounded-2xl text-white shadow-lg shadow-emerald-200 group-hover:scale-105 transition duration-200">
+            <div className="p-2.5 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl text-slate-950 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition duration-200">
               <Leaf className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-2xl font-black text-gray-900 tracking-tight leading-none block">
-                Krishi<span className="text-emerald-600">Mitra</span>
+              <span className="text-2xl font-black tracking-tight leading-none block text-white">
+                Krishi<span className="text-emerald-400">Mitra</span>
               </span>
-              <span className="text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase block">
-                किसान मित्र एआई
+              <span className="text-[10px] font-extrabold text-emerald-400 tracking-widest uppercase block">
+                Agri Advisory & Intelligence
               </span>
             </div>
           </Link>
@@ -75,7 +83,7 @@ export function Navbar() {
           {/* Desktop Navigation Links */}
           {user && (
             <nav className="hidden lg:flex items-center gap-1">
-              {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+              {NAV_ITEMS.slice(0, 7).map(({ href, label, icon: Icon }) => {
                 const active = pathname === href;
                 return (
                   <Link
@@ -83,11 +91,11 @@ export function Navbar() {
                     href={href}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
                       active
-                        ? "bg-emerald-100 text-emerald-900 shadow-sm border border-emerald-200"
-                        : "text-gray-700 hover:text-emerald-800 hover:bg-emerald-50/60"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-sm"
+                        : "text-slate-300 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${active ? "text-emerald-700" : "text-gray-500"}`} />
+                    <Icon className={`h-4 w-4 ${active ? "text-emerald-400" : "text-slate-400"}`} />
                     <span>{label}</span>
                   </Link>
                 );
@@ -98,33 +106,33 @@ export function Navbar() {
           {/* Right Action / Profile */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-700">
                 <Link
                   href="/voice-assistant"
-                  className="flex items-center gap-1.5 text-xs font-black text-purple-700 bg-purple-50 hover:bg-purple-100 px-3.5 py-2 rounded-xl border border-purple-200 shadow-sm transition active:scale-95 animate-pulse"
+                  className="flex items-center gap-1.5 text-xs font-bold text-purple-300 bg-purple-950/60 hover:bg-purple-900/80 px-3.5 py-2 rounded-xl border border-purple-500/30 shadow-sm transition active:scale-95"
                 >
-                  <Mic className="h-4 w-4 text-purple-600" />
-                  <span>आवाज़ सहायक</span>
+                  <Mic className="h-4 w-4 text-purple-400 animate-pulse" />
+                  <span>Voice AI</span>
                 </Link>
 
-                <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-2xl border border-emerald-200">
-                  <div className="w-8 h-8 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow">
+                <div className="flex items-center gap-2.5 bg-slate-800/80 px-3.5 py-1.5 rounded-2xl border border-slate-700">
+                  <div className="w-8 h-8 bg-emerald-500 text-slate-950 rounded-xl flex items-center justify-center text-xs font-black shadow">
                     {user.full_name?.charAt(0).toUpperCase() || "K"}
                   </div>
                   <div className="text-left">
-                    <p className="text-xs font-extrabold text-gray-900 leading-tight">
-                      {user.full_name || "Kisan User"}
+                    <p className="text-xs font-extrabold text-white leading-tight">
+                      {user.full_name || "Agri User"}
                     </p>
-                    <p className="text-[10px] text-emerald-700 font-bold leading-tight flex items-center gap-0.5">
+                    <p className="text-[10px] text-emerald-400 font-bold leading-tight flex items-center gap-0.5">
                       <MapPin className="h-2.5 w-2.5 inline" />
-                      {user.location_name || "Rajasthan, India"}
+                      {user.role ? user.role.toUpperCase() : "FARMER"} • {user.location_name || "India"}
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-xl border border-red-200 transition active:scale-95"
+                  className="flex items-center gap-1.5 text-xs font-bold text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 px-3 py-2 rounded-xl border border-rose-800/40 transition active:scale-95"
                   title="Sign Out"
                 >
                   <LogOut className="h-3.5 w-3.5" />
@@ -132,18 +140,18 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <Link
                   href="/login"
-                  className="text-xs font-bold text-gray-700 hover:text-emerald-700 px-4 py-2 rounded-xl transition"
+                  className="text-xs font-bold text-slate-200 hover:text-white px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 transition"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 hover:from-emerald-700 hover:to-teal-700 px-4 py-2.5 rounded-xl shadow-md shadow-emerald-200 transition active:scale-95"
+                  className="text-xs font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 px-4 py-2.5 rounded-xl shadow-md shadow-emerald-500/20 transition active:scale-95"
                 >
-                  Create Account
+                  Create Free Account
                 </Link>
               </div>
             )}
@@ -154,14 +162,14 @@ export function Navbar() {
             {user && (
               <Link
                 href="/voice-assistant"
-                className="p-2 text-purple-700 bg-purple-50 rounded-xl border border-purple-200"
+                className="p-2 text-purple-300 bg-purple-950/60 rounded-xl border border-purple-500/30"
               >
                 <Mic className="h-5 w-5" />
               </Link>
             )}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-xl text-gray-700 hover:bg-gray-100 focus:outline-none"
+              className="p-2 rounded-xl text-slate-300 hover:bg-slate-800 focus:outline-none"
             >
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -171,16 +179,16 @@ export function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-gray-100 bg-white px-4 pt-3 pb-6 space-y-2">
+        <div className="lg:hidden border-t border-slate-800 bg-slate-900 px-4 pt-3 pb-6 space-y-2">
           {user ? (
             <>
-              <div className="p-3 bg-emerald-50 rounded-2xl mb-3 border border-emerald-100 flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow">
+              <div className="p-3 bg-slate-800 rounded-2xl mb-3 border border-slate-700 flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-500 text-slate-950 rounded-xl flex items-center justify-center text-sm font-black shadow">
                   {user.full_name?.charAt(0).toUpperCase() || "K"}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">{user.full_name || "Kisan User"}</p>
-                  <p className="text-xs text-emerald-700 font-semibold">{user.location_name || "India"}</p>
+                  <p className="text-sm font-bold text-white">{user.full_name || "Agri User"}</p>
+                  <p className="text-xs text-emerald-400 font-semibold">{user.role?.toUpperCase() || "USER"} • {user.location_name || "India"}</p>
                 </div>
               </div>
 
@@ -192,7 +200,7 @@ export function Navbar() {
                     href={href}
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition ${
-                      active ? "bg-emerald-600 text-white shadow-md" : "text-gray-700 hover:bg-gray-100"
+                      active ? "bg-emerald-500 text-slate-950 shadow-md" : "text-slate-300 hover:bg-slate-800"
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -206,7 +214,7 @@ export function Navbar() {
                   setMobileOpen(false);
                   logout();
                 }}
-                className="w-full mt-3 flex items-center justify-center gap-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 py-3 rounded-xl border border-red-200 transition"
+                className="w-full mt-3 flex items-center justify-center gap-2 text-sm font-bold text-rose-400 bg-rose-950/40 hover:bg-rose-900/60 py-3 rounded-xl border border-rose-800/40 transition"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -217,14 +225,14 @@ export function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="block text-center text-sm font-bold text-gray-700 bg-gray-100 py-3 rounded-xl"
+                className="block text-center text-sm font-bold text-slate-200 bg-slate-800 py-3 rounded-xl"
               >
                 Sign In
               </Link>
               <Link
                 href="/signup"
                 onClick={() => setMobileOpen(false)}
-                className="block text-center text-sm font-bold text-white bg-emerald-600 py-3 rounded-xl"
+                className="block text-center text-sm font-bold text-slate-950 bg-emerald-400 py-3 rounded-xl"
               >
                 Create Account
               </Link>

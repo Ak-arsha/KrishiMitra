@@ -28,7 +28,7 @@ export default function LoginPage() {
       email: "akarshaagarwal25@gmail.com",
       avatarBg: "bg-blue-600",
       initials: "AA",
-      role: "Verified Google Account",
+      role: "Verified Google Profile",
     },
     {
       name: "Farmer Demo User",
@@ -92,22 +92,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-green-900 to-teal-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background Decorative Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-green-500/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Agriculture Photo Background with Overlay */}
+      <div className="absolute inset-0 z-0 opacity-25 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/90 to-emerald-950/80 z-0 pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center p-3.5 bg-gradient-to-tr from-green-500 to-emerald-400 rounded-2xl text-white shadow-xl shadow-green-900/40 mb-3 border border-green-400/30">
+          <div className="inline-flex items-center justify-center p-3.5 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl text-slate-950 shadow-xl shadow-emerald-500/20 mb-3 border border-emerald-400/30">
             <Leaf className="w-9 h-9" />
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight flex items-center justify-center gap-2">
-            KrishiMitra <span className="text-2xl">🌾</span>
+            Krishi<span className="text-emerald-400">Mitra</span>
           </h1>
-          <p className="text-emerald-200/80 text-sm mt-1.5 font-medium">
-            Smart Farm Advisory & Market Intelligence Platform
+          <p className="text-slate-300 text-sm mt-1.5 font-medium">
+            Agri Advisory & Multi-Role Mandi Platform
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export default function LoginPage() {
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
-            <p className="text-gray-500 text-sm mt-0.5">Sign in to access your farm dashboard & market insights</p>
+            <p className="text-gray-500 text-sm mt-0.5">Sign in to access your dashboard & market insights</p>
           </div>
 
           {error && (
@@ -130,7 +130,7 @@ export default function LoginPage() {
             type="button"
             onClick={() => setShowGoogleModal(true)}
             disabled={isLoading}
-            className="w-full mb-6 bg-white border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-gray-800 font-semibold py-3.5 px-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-3 group active:scale-[0.99] disabled:opacity-50"
+            className="w-full mb-6 bg-white border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-gray-800 font-semibold py-3.5 px-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-3 group active:scale-[0.99] disabled:opacity-50 text-sm"
           >
             <svg className="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
               <path
@@ -150,7 +150,7 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span className="text-sm">Sign in with Google</span>
+            <span>Sign in with Google</span>
           </button>
 
           {/* Divider */}
@@ -215,7 +215,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.99] disabled:opacity-50"
+              className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.99] disabled:opacity-50 text-sm"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -232,7 +232,7 @@ export default function LoginPage() {
           </form>
 
           {/* Demo Account Auto-Fill Card */}
-          <div className="mt-6 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 rounded-2xl p-4 shadow-sm">
+          <div className="mt-6 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-emerald-600 text-white rounded-lg">
