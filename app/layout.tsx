@@ -6,6 +6,29 @@ import { AuthProvider } from "@/app/context/AuthContext";
 export const metadata: Metadata = {
   title: "KrishiMitra — AI Farm Advisory & Multi-Role Mandi Ecosystem",
   description: "AI Sell Advisor, Buyer Recommendations, Market Intelligence, and Storage Advice for farmers, buyers, investors, and traders.",
+  metadataBase: new URL("https://krishi-mitra-git-main-akarshas-projects-0572edd8.vercel.app"),
+  openGraph: {
+    title: "KrishiMitra — AI Farm Advisory & Multi-Role Mandi Ecosystem",
+    description: "Multi-role Mandi platform providing real-time APMC price forecasts, direct procurement RFQs, yield ROI models, and voice AI.",
+    url: "https://krishi-mitra-git-main-akarshas-projects-0572edd8.vercel.app",
+    siteName: "KrishiMitra AI Platform",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200",
+        width: 1200,
+        height: 630,
+        alt: "KrishiMitra Agricultural Advisory Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KrishiMitra — AI Farm Advisory & Multi-Role Mandi Ecosystem",
+    description: "Multi-role Mandi platform providing real-time APMC price forecasts, direct procurement RFQs, yield ROI models, and voice AI.",
+    images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
