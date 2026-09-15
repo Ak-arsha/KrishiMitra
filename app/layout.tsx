@@ -4,8 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { AuthProvider } from "@/app/context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "KrishiMitra — AI Farm Advisory & Market Intelligence",
-  description: "AI Sell Advisor, Buyer Recommendations, Market Intelligence, and Storage Advice for farmers.",
+  title: "KrishiMitra — AI Farm Advisory & Multi-Role Mandi Ecosystem",
+  description: "AI Sell Advisor, Buyer Recommendations, Market Intelligence, and Storage Advice for farmers, buyers, investors, and traders.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
             <footer className="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
-              <p>© 2026 KrishiMitra 🌾 — AI Farm Advisory & Market Intelligence. Built with Next.js, FastAPI & Supabase.</p>
+              <p>© 2026 KrishiMitra 🌾 — AI Farm Advisory & Multi-Role Mandi Ecosystem. Built with Next.js & KrishiMitra AI Engine.</p>
             </footer>
           </div>
         </AuthProvider>
